@@ -25,13 +25,13 @@ resource "aws_s3_bucket_policy" "image_storage_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowFullAccess",
-        Effect    = "Allow",
+        Sid    = "AllowFullAccess",
+        Effect = "Allow",
         Principal = {
           AWS = "arn:aws:iam::678468774710:root"
         },
-        Action    = "*",
-        Resource  = [
+        Action = "*",
+        Resource = [
           aws_s3_bucket.image_storage.arn,
           "${aws_s3_bucket.image_storage.arn}/*",
         ],

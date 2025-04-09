@@ -23,10 +23,10 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid       = "AllowFullAccess",
-        Effect    = "Allow",
-        Action    = "dynamodb:*",
-        Resource  = aws_dynamodb_table.image_metadata.arn
+        Sid      = "AllowFullAccess",
+        Effect   = "Allow",
+        Action   = "dynamodb:*",
+        Resource = aws_dynamodb_table.image_metadata.arn
       },
     ],
   })
