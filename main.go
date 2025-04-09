@@ -1,26 +1,42 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
 
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/iypetrov/go-cr/config"
+	"github.com/iypetrov/go-cr/distribution"
 	"github.com/iypetrov/go-cr/logger"
-	"github.com/iypetrov/go-cr/registry"
 )
 
 func main() {
 	mux := chi.NewRouter()
 
+	ctx := context.Background()
 	cfg := config.New()
 	log := logger.New(cfg)
+	awsCfg, err := awscfg.LoadDefaultConfig(
+		ctx,
+		awscfg.WithRegion(cfg.AWS.Region),
+	)
+	if err != nil {
+		log.Error("Failed to load AWS config: %v", err.Error())
+	}
 
-	registry := registry.New(log)
+	storage := distribution.NewStorage(awsCfg, log)
+	metadata := distribution.NewMetadata(awsCfg, log)
+	registry := distribution.NewRegistry(
+		storage,
+		metadata,
+		log,
+	)
 
-	mux.With().Route("/v2", registry.Router())
-
+	mux.With().Route("/v2", distribution.Router(registry))
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.App.Port),
 		IdleTimeout:  time.Minute,
